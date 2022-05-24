@@ -14,7 +14,6 @@ public class MCVersion {
         return prefix;
     }
 
-
     public String getName() {
         return name;
     }
