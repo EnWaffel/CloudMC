@@ -1,6 +1,9 @@
 package net.projectp.cloudmc.command;
 
 import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.util.result.Fail;
+import net.projectp.cloudmc.util.result.Result;
+import net.projectp.cloudmc.util.result.Success;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +16,8 @@ public class CommandConsole extends Thread {
     private final HashMap<String,CommandExecutor> registeredCommands = new HashMap<>();
     private boolean enabled;
     private final ConsoleOutput output;
+    private QuestionSequence questionSequence = null;
+    private QuestionSequence questionSequenceQueue = null;
 
     public CommandConsole(CloudSystem cloudSystem) {
         this.cloudSystem = cloudSystem;
@@ -37,13 +42,17 @@ public class CommandConsole extends Thread {
         start();
     }
 
+    public void ask(QuestionSequence questionSequence) {
+        this.questionSequenceQueue = questionSequence;
+    }
+
     @Override
     public void run() {
         try {
             while (!interrupted()) {
                     Scanner scanner = new Scanner(System.in);
                     String in = scanner.nextLine();
-                    if (enabled) {
+                    if (enabled && questionSequence == null) {
                         if (!in.isEmpty()) {
                             List<Object> formattedCommand = formatCommand(in);
                             if (registeredCommands.containsKey((String)formattedCommand.get(0))) {
@@ -52,6 +61,29 @@ public class CommandConsole extends Thread {
                                cloudSystem.getLogger().err("Command \""+formattedCommand.get(0)+"\" not found! Try \"help\" or \"info\" for all commands!");
                         }
                     }
+                }
+                if (questionSequence != null) {
+                    if (!in.isEmpty()) {
+                        Result result = questionSequence.call(in);
+                        if (result instanceof Success) {
+                            if (questionSequence.getCurrentQuestion() < (questionSequence.getQuestions().size() - 1)) {
+                                questionSequence.setCurrentQuestion(questionSequence.getCurrentQuestion() + 1);
+                                System.out.println(questionSequence.getQuestions().get(questionSequence.getCurrentQuestion()));
+                            } else {
+                                questionSequence.setCurrentQuestion(-1);
+                                questionSequence.call(null);
+                                questionSequence = null;
+                            }
+                        } else if (result instanceof Fail) {
+                            System.out.println(((Fail) result).getMessage());
+                            System.out.println(questionSequence.getQuestions().get(questionSequence.getCurrentQuestion()));
+                        }
+                    }
+                }
+                if (questionSequenceQueue != null) {
+                    questionSequence = questionSequenceQueue;
+                    questionSequenceQueue = null;
+                    System.out.println(questionSequence.getQuestions().get(questionSequence.getCurrentQuestion()));
                 }
             }
         } catch (Exception e) {

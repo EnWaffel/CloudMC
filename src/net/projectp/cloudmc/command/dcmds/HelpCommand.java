@@ -1,15 +1,14 @@
 package net.projectp.cloudmc.command.dcmds;
 
+import net.projectp.cloudmc._;
 import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.command.CommandExecutor;
 import net.projectp.cloudmc.command.ConsoleOutput;
 
-public class DEFAULT_HELP implements CommandExecutor {
+public class HelpCommand extends _ implements CommandExecutor {
 
-    private final CloudSystem cloudSystem;
-
-    public DEFAULT_HELP(CloudSystem cloudSystem) {
-        this.cloudSystem = cloudSystem;
+    public HelpCommand(CloudSystem cloud) {
+        super(cloud);
     }
 
     @Override
@@ -17,10 +16,6 @@ public class DEFAULT_HELP implements CommandExecutor {
         output.info("Commands:");
         output.info("-help <help,info,h,i>");
         output.info("-group <create>");
-    }
-
-    public CloudSystem getCloudSystem() {
-        return cloudSystem;
     }
 
 }

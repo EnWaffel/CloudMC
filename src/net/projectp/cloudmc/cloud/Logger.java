@@ -1,5 +1,6 @@
 package net.projectp.cloudmc.cloud;
 
+import net.projectp.cloudmc._;
 import net.projectp.cloudmc.util.Colors;
 
 import java.time.LocalDateTime;
@@ -7,22 +8,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Logger {
+public class Logger extends _ {
 
-    private final CloudSystem cs;
     private final List<String> logs = new ArrayList<>();
 
-    public Logger(CloudSystem cs) {
-        this.cs = cs;
+    public Logger(CloudSystem cloud) {
+        super(cloud);
     }
 
-    public void info(String text,boolean prefix) {
-        if (prefix) {
-            System.out.println("[" + getCurrentTime() + "][CLOUD/INFO] " + text);
-            logs.add("[" + getCurrentTime() + "][CLOUD/INFO] " + text);
-        } else {
-            System.out.println(text);
-        }
+    public void i(String text) {
+        String message = "[" + getCurrentTime() + "][CLOUD/INFO] " + text;
+        System.out.println(message);
+        logs.add(message);
     }
 
     public void warn(String text) {
@@ -54,7 +51,7 @@ public class Logger {
     }
 
     public CloudSystem getCloudSystem() {
-        return cs;
+        return cloud;
     }
 
 }

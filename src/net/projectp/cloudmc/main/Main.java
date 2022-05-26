@@ -4,12 +4,9 @@ import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.util.Util;
 
 public class Main {
-
     private static CloudSystem cloudSystem;
-
     public static void main(String[] args) {
         cloudSystem = new CloudSystem();
-        System.out.println(Util.getOS());
     }
 
     public static boolean isRunning() {

@@ -1,15 +1,17 @@
 package net.projectp.cloudmc.cloud;
 
-import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;
-import net.projectp.cloudmc.command.CommandConsole;
-import net.projectp.cloudmc.command.dcmds.DEFAULT_HELP;
 import net.projectp.cloudmc.api.event.Event;
 import net.projectp.cloudmc.api.event.EventHandler;
 import net.projectp.cloudmc.api.event.EventListener;
+import net.projectp.cloudmc.command.CommandConsole;
+import net.projectp.cloudmc.command.QuestionSequence;
+import net.projectp.cloudmc.command.dcmds.GroupCommand;
+import net.projectp.cloudmc.command.dcmds.HelpCommand;
 import net.projectp.cloudmc.main.Main;
-import net.projectp.cloudmc.util.Util;
+import net.projectp.cloudmc.service.ServiceFactory;
+import net.projectp.cloudmc.util.result.Success;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -21,10 +23,11 @@ import java.util.List;
 
 public class CloudSystem {
 
-    private final HashMap<String,JSONObject> configs = new HashMap<>();
+    private final HashMap<String, JSONObject> configs = new HashMap<>();
 
     private final Logger logger;
     private final CommandConsole console;
+    public final ServiceFactory serviceFactory;
 
     private final List<EventListener> eventListeners = new ArrayList<>();
 
@@ -33,52 +36,55 @@ public class CloudSystem {
     public CloudSystem() {
         this.logger = new Logger(this);
         this.console = new CommandConsole(this);
+        this.serviceFactory = new ServiceFactory(this);
         load();
     }
 
     private void load() {
-        logger.info("loading...",true);
+        logger.i("loading...");
         loadFiles();
-            // welcome text
-        logger.info(
-                "   _____   _                       _   __  __    _____      ___        _____       ______ \n" +
+        // welcome text
+        logger.i(
+                "Enabling:\n   _____   _                       _   __  __    _____      ___        _____       ______ \n" +
                         "  / ____| | |                     | | |  \\/  |  / ____|    / _ \\      | ____|     |____  |\n" +
                         " | |      | |   ___    _   _    __| | | \\  / | | |        | | | |     | |__           / / \n" +
                         " | |      | |  / _ \\  | | | |  / _` | | |\\/| | | |        | | | |     |___ \\         / /  \n" +
                         " | |____  | | | (_) | | |_| | | (_| | | |  | | | |____    | |_| |  _   ___) |  _    / /   \n" +
                         "  \\_____| |_|  \\___/   \\__,_|  \\__,_| |_|  |_|  \\_____|    \\___/  (_) |____/  (_)  /_/    \n" +
                         "                                                                                          \n" +
-                        "                                                                                          ",false);
+                        "                                                                                          ");
 
         // internal commands
 
-        console.registerCommand("help",new DEFAULT_HELP(this));
-        console.registerCommand("info",new DEFAULT_HELP(this));
-        console.registerCommand("h",new DEFAULT_HELP(this));
-        console.registerCommand("i",new DEFAULT_HELP(this));
+        console.registerCommand("help", new HelpCommand(this));
+        console.registerCommand("info", new HelpCommand(this));
+        console.registerCommand("h", new HelpCommand(this));
+        console.registerCommand("i", new HelpCommand(this));
+        console.registerCommand("group", new GroupCommand(this));
 
-
+        //serviceFactory.requestPreparedService(new ServicePrepareRequest(new Group("test", new FileOrPath("")), 1, 1));
+        QuestionSequence sequence = new QuestionSequence((i, text) -> new Success(), "test", "asdsad");
+        //console.ask(sequence);
     }
 
     // file stuff
 
     private void loadFiles() {
         String defaultURL = "https://assets.bierfrust.de/webservice/cloudmc/";
-        logger.info("loading files...",true);
+        logger.i("loading files...");
         createFolders("groups", "modules", "services", "services/temp", "services/static");
         //JSONObject v = Util.readJsonFromUrl(defaultURL+"version.json");
 
         FileUtil.writeFileIf(new JSONObject().put("server", new JSONObject()
                 .put("ip", "localhost")
-                .put("linux-startArgs", "#!/bin/bash\n java -Xmx%maxRam%MB -jar spigot.jar")
-                .put("windows-startArgs", "java -Xmx%maxRam%MB -jar spigot.jar")
+                .put("startArgs", "java -Xmx%maxRam%MB -jar spigot.jar")
         ), new FileOrPath("config.json"), !new FileOrPath("config.json").getFile().exists());
         loadConfigs(new FileOrPath("config.json"));
 
         if (!"".equals(Main.getVersion())) {
             logger.warn("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
         } else {
-            logger.info("Everything is up to date!",true);
+            logger.i("Everything is up to date!");
         }
 
     }
