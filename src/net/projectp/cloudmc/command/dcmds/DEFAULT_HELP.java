@@ -13,7 +13,7 @@ public class DEFAULT_HELP implements CommandExecutor {
     }
 
     @Override
-    public void onCommand(String[] args,ConsoleOutput output) {
+    public void onCommand(String[] args, ConsoleOutput output) {
         output.info("Commands:");
         output.info("-help <help,info,h,i>");
         output.info("-group <create>");

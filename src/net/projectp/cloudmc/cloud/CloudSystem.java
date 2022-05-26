@@ -1,12 +1,13 @@
 package net.projectp.cloudmc.cloud;
 
+import de.enwaffel.randomutils.Properties;
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;
 import net.projectp.cloudmc.command.CommandConsole;
 import net.projectp.cloudmc.command.dcmds.DEFAULT_HELP;
-import net.projectp.cloudmc.event.Event;
-import net.projectp.cloudmc.event.EventHandler;
-import net.projectp.cloudmc.event.EventListener;
+import net.projectp.cloudmc.api.event.Event;
+import net.projectp.cloudmc.api.event.EventHandler;
+import net.projectp.cloudmc.api.event.EventListener;
 import net.projectp.cloudmc.main.Main;
 import net.projectp.cloudmc.util.Util;
 import org.json.JSONObject;
@@ -14,14 +15,12 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class CloudSystem {
 
-    private final Properties properties;
     private final HashMap<String,JSONObject> configs = new HashMap<>();
 
     private final Logger logger;
@@ -31,8 +30,7 @@ public class CloudSystem {
 
     private final String version = "0.0.01";
 
-    public CloudSystem(Properties properties) {
-        this.properties = properties;
+    public CloudSystem() {
         this.logger = new Logger(this);
         this.console = new CommandConsole(this);
         load();
@@ -67,20 +65,18 @@ public class CloudSystem {
     private void loadFiles() {
         String defaultURL = "https://assets.bierfrust.de/webservice/cloudmc/";
         logger.info("loading files...",true);
+        createFolders("groups", "modules", "services", "services/temp", "services/static");
         //JSONObject v = Util.readJsonFromUrl(defaultURL+"version.json");
 
-        File cfg = new File("config.json");
-        Util.saveFile(cfg);
-
-        Util.writeFile(cfg,"{%" +
-                "$test$:" +
-                "$teet$" +
-                "" +
-                "}",false);
-        loadConfigs(new File[]{cfg});
+        FileUtil.writeFileIf(new JSONObject().put("server", new JSONObject()
+                .put("ip", "localhost")
+                .put("linux-startArgs", "#!/bin/bash\n java -Xmx%maxRam%MB -jar spigot.jar")
+                .put("windows-startArgs", "java -Xmx%maxRam%MB -jar spigot.jar")
+        ), new FileOrPath("config.json"), !new FileOrPath("config.json").getFile().exists());
+        loadConfigs(new FileOrPath("config.json"));
 
         if (!"".equals(Main.getVersion())) {
-            logger.warn("You are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
+            logger.warn("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
         } else {
             logger.info("Everything is up to date!",true);
         }
@@ -95,10 +91,16 @@ public class CloudSystem {
 
     // config stuff
 
-    private void loadConfigs(File[] configs) {
+    public void createFolders(String... paths) {
+        for (String path : paths) {
+            new File(path).mkdirs();
+        }
+    }
+
+    private void loadConfigs(FileOrPath... configs) {
         try {
-            for (File file : configs) {
-                this.configs.put(file.getName().split("\\.")[0], FileUtil.readJSON(new FileOrPath(file)));
+            for (FileOrPath file : configs) {
+                this.configs.put(file.getFile().getName().split("\\.")[0], FileUtil.readJSON(file));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -145,10 +147,6 @@ public class CloudSystem {
 
     public JSONObject getConfig(String name) {
         return configs.get(name);
-    }
-
-    public Properties getProperties() {
-        return properties;
     }
 
     public CommandConsole getConsole() {

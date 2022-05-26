@@ -1,12 +1,12 @@
-package net.projectp.cloudmc.event;
+package net.projectp.cloudmc.api.event;
 
 import net.projectp.cloudmc.group.Group;
 
-public class GroupDeleteEvent extends Event {
+public class GroupCreateEvent extends Event {
 
     private final Group group;
 
-    public GroupDeleteEvent(Group group) {
+    public GroupCreateEvent(Group group) {
         this.group = group;
     }
 

@@ -1,4 +1,4 @@
-package net.projectp.cloudmc.event;
+package net.projectp.cloudmc.api.event;
 
 import java.util.ArrayList;
 import java.util.List;
