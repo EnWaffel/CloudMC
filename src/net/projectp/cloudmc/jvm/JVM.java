@@ -2,13 +2,13 @@ package net.projectp.cloudmc.jvm;
 
 import de.enwaffel.randomutils.buff.InByteBuffer;
 import de.enwaffel.randomutils.file.FileOrPath;
-import net.projectp.cloudmc._;
+import net.projectp.cloudmc.B;
 import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.util.result.Fail;
 import net.projectp.cloudmc.util.result.Result;
 import net.projectp.cloudmc.util.result.Success;
 
-public class JVM extends _ {
+public class JVM extends B {
 
     private Process jvm;
     private Thread thread;
@@ -24,8 +24,8 @@ public class JVM extends _ {
             jvm = builder.start();
             thread = new Thread(this::runThread);
         } catch (Exception e) {
-            cloud.getLogger().err("Failed to start jvm.");
-            cloud.getLogger().exception(Thread.currentThread(), e);
+            cloud.getLogger().e("Failed to start jvm.");
+            cloud.getLogger().ex(Thread.currentThread(), e);
         }
         return this;
     }

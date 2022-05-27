@@ -13,7 +13,6 @@ import net.projectp.http.HttpFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -69,7 +68,7 @@ public class ServiceFactory {
             String servicePath = serviceType == 0 ? "services/temp/" + group.getName() + "-" + serviceId : "services/static/" + group.getName() + "-" + serviceNumber;
             Result result = createServiceFiles(group, serviceId, servicePath);
             if (result instanceof Fail) {
-                cloud.getLogger().err(((Fail) result).getMessage());
+                cloud.getLogger().e(((Fail) result).getMessage());
                 return null;
             }
             PreparedService preparedService = new PreparedService(cloud, group, serviceId, type, serviceType, serviceNumber);

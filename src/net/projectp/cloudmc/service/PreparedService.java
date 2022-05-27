@@ -1,12 +1,12 @@
 package net.projectp.cloudmc.service;
 
-import net.projectp.cloudmc._;
+import net.projectp.cloudmc.B;
 import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.group.Group;
 
 import java.util.UUID;
 
-public class PreparedService extends _ {
+public class PreparedService extends B {
 
     private final Group group;
     private final UUID uuid;

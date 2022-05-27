@@ -1,6 +1,6 @@
 package net.projectp.cloudmc.cloud;
 
-import net.projectp.cloudmc._;
+import net.projectp.cloudmc.B;
 import net.projectp.cloudmc.util.Colors;
 
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Logger extends _ {
+public class Logger extends B {
 
     private final List<String> logs = new ArrayList<>();
 
@@ -22,12 +22,12 @@ public class Logger extends _ {
         logs.add(message);
     }
 
-    public void warn(String text) {
+    public void w(String text) {
         System.out.println("["+getCurrentTime()+"][CLOUD/WARNING] "+Colors.YELLOW+text+Colors.RESET);
         logs.add("["+getCurrentTime()+"][CLOUD/WARNING] "+text);
     }
 
-    public void err(String text) {
+    public void e(String text) {
         System.out.println("["+getCurrentTime()+"][CLOUD/ERROR] "+Colors.RED+text+Colors.RESET);
         logs.add("["+getCurrentTime()+"][CLOUD/ERROR] "+text);
     }
@@ -38,7 +38,7 @@ public class Logger extends _ {
         return dtf.format(now);
     }
 
-    public void exception(Thread thread,Exception e) {
+    public void ex(Thread thread, Exception e) {
         System.out.println("["+getCurrentTime()+"][CLOUD/EXCEPTION]"+Colors.RED+" An unexpected exception occurred in thread: "+thread.getName()+" ("+e+": "+e.getMessage()+")"+Colors.RESET);
     }
 
@@ -48,10 +48,6 @@ public class Logger extends _ {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public CloudSystem getCloudSystem() {
-        return cloud;
     }
 
 }

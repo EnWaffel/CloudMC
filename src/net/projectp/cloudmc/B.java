@@ -2,11 +2,11 @@ package net.projectp.cloudmc;
 
 import net.projectp.cloudmc.cloud.CloudSystem;
 
-public abstract class _ {
+public abstract class B {
 
     protected final CloudSystem cloud;
 
-    public _(CloudSystem cloud) {
+    public B(CloudSystem cloud) {
         this.cloud = cloud;
     }
 

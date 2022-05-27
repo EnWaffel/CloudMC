@@ -1,11 +1,11 @@
-package net.projectp.cloudmc.command.dcmds;
+package net.projectp.cloudmc.command.commands;
 
-import net.projectp.cloudmc._;
+import net.projectp.cloudmc.B;
 import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.command.CommandExecutor;
 import net.projectp.cloudmc.command.ConsoleOutput;
 
-public class HelpCommand extends _ implements CommandExecutor {
+public class HelpCommand extends B implements CommandExecutor {
 
     public HelpCommand(CloudSystem cloud) {
         super(cloud);

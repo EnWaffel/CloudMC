@@ -1,6 +1,7 @@
 package net.projectp.cloudmc.command;
 
 import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.util.Colors;
 import net.projectp.cloudmc.util.result.Fail;
 import net.projectp.cloudmc.util.result.Result;
 import net.projectp.cloudmc.util.result.Success;
@@ -58,7 +59,7 @@ public class CommandConsole extends Thread {
                             if (registeredCommands.containsKey((String)formattedCommand.get(0))) {
                              registeredCommands.get((String)formattedCommand.get(0)).onCommand((String[])formattedCommand.get(1),output);
                             } else {
-                               cloudSystem.getLogger().err("Command \""+formattedCommand.get(0)+"\" not found! Try \"help\" or \"info\" for all commands!");
+                               cloudSystem.getLogger().e("Command \""+formattedCommand.get(0)+"\" not found! Try \"help\" or \"info\" for all commands!");
                         }
                     }
                 }
@@ -73,9 +74,10 @@ public class CommandConsole extends Thread {
                                 questionSequence.setCurrentQuestion(-1);
                                 questionSequence.call(null);
                                 questionSequence = null;
+                                continue;
                             }
                         } else if (result instanceof Fail) {
-                            System.out.println(((Fail) result).getMessage());
+                            System.out.println(Colors.RED + ((Fail) result).getMessage() + Colors.RESET);
                             System.out.println(questionSequence.getQuestions().get(questionSequence.getCurrentQuestion()));
                         }
                     }

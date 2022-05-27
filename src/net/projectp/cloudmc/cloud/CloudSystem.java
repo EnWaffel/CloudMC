@@ -7,8 +7,8 @@ import net.projectp.cloudmc.api.event.EventHandler;
 import net.projectp.cloudmc.api.event.EventListener;
 import net.projectp.cloudmc.command.CommandConsole;
 import net.projectp.cloudmc.command.QuestionSequence;
-import net.projectp.cloudmc.command.dcmds.GroupCommand;
-import net.projectp.cloudmc.command.dcmds.HelpCommand;
+import net.projectp.cloudmc.command.commands.GroupCommand;
+import net.projectp.cloudmc.command.commands.HelpCommand;
 import net.projectp.cloudmc.main.Main;
 import net.projectp.cloudmc.service.ServiceFactory;
 import net.projectp.cloudmc.util.result.Success;
@@ -82,7 +82,7 @@ public class CloudSystem {
         loadConfigs(new FileOrPath("config.json"));
 
         if (!"".equals(Main.getVersion())) {
-            logger.warn("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
+            logger.w("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
         } else {
             logger.i("Everything is up to date!");
         }
