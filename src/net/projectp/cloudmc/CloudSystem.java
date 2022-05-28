@@ -1,4 +1,4 @@
-package net.projectp.cloudmc.cloud;
+package net.projectp.cloudmc;
 
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;

@@ -1,7 +1,7 @@
 package net.projectp.cloudmc.service;
 
 import net.projectp.cloudmc.B;
-import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.group.Group;
 import net.projectp.cloudmc.util.MCVersion;
 import net.projectp.cloudmc.util.Util;

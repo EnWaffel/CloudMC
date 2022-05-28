@@ -1,7 +1,6 @@
 package net.projectp.cloudmc.main;
 
-import net.projectp.cloudmc.cloud.CloudSystem;
-import net.projectp.cloudmc.util.Util;
+import net.projectp.cloudmc.CloudSystem;
 
 public class Main {
     private static CloudSystem cloudSystem;

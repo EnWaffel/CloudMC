@@ -101,4 +101,12 @@ public class Util {
         }
     }
 
+    public static Integer isNumber(String num) {
+        try {
+            return Integer.parseInt(num);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

@@ -1,6 +1,6 @@
 package net.projectp.cloudmc.command;
 
-import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.util.Colors;
 import net.projectp.cloudmc.util.result.Fail;
 import net.projectp.cloudmc.util.result.Result;

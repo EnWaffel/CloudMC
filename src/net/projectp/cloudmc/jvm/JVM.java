@@ -3,7 +3,7 @@ package net.projectp.cloudmc.jvm;
 import de.enwaffel.randomutils.buff.InByteBuffer;
 import de.enwaffel.randomutils.file.FileOrPath;
 import net.projectp.cloudmc.B;
-import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.util.result.Fail;
 import net.projectp.cloudmc.util.result.Result;
 import net.projectp.cloudmc.util.result.Success;

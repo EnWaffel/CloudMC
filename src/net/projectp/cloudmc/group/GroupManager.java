@@ -1,6 +1,6 @@
 package net.projectp.cloudmc.group;
 
-import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.service.Service;
 
 public class GroupManager {

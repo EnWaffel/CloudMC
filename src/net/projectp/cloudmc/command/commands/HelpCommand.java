@@ -1,7 +1,7 @@
 package net.projectp.cloudmc.command.commands;
 
 import net.projectp.cloudmc.B;
-import net.projectp.cloudmc.cloud.CloudSystem;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.command.CommandExecutor;
 import net.projectp.cloudmc.command.ConsoleOutput;
 

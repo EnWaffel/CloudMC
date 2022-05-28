@@ -1,7 +1,5 @@
 package net.projectp.cloudmc;
 
-import net.projectp.cloudmc.cloud.CloudSystem;
-
 public abstract class B {
 
     protected final CloudSystem cloud;

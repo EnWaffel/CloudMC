@@ -1,6 +1,7 @@
-package net.projectp.cloudmc.cloud;
+package net.projectp.cloudmc;
 
 import net.projectp.cloudmc.B;
+import net.projectp.cloudmc.CloudSystem;
 import net.projectp.cloudmc.util.Colors;
 
 import java.time.LocalDateTime;
