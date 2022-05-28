@@ -1,10 +1,16 @@
 package net.projectp.cloudmc.util;
 
+import de.enwaffel.randomutils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileUtil;
+import javafx.scene.shape.Path;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class Util {
@@ -80,6 +86,18 @@ public class Util {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void copyIfNotExist(String from, String to) throws IOException {
+        if (!new File(to).exists()) {
+            Files.copy(Paths.get(from), Paths.get(to), StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    public static void writeIfNotExist(String data, String to) {
+        if (!new File(to).exists()) {
+            FileUtil.writeFile(data, new FileOrPath(to));
         }
     }
 

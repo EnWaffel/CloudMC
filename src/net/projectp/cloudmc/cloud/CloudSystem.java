@@ -159,6 +159,10 @@ public class CloudSystem {
         return console;
     }
 
+    public ServiceFactory getServiceFactory() {
+        return serviceFactory;
+    }
+
     //public String getVersion() { return getConfig("version").getString("version"); }
 
 }

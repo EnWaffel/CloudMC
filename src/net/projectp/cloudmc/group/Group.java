@@ -21,7 +21,7 @@ public class Group {
 
     private final HashMap<UUID, Service> servers = new HashMap<>();
 
-    public Group(String name, FileOrPath file) {
+    public Group(String name) {
         this.name = name;
         //this.json = FileUtil.readJSON(file);
     }
@@ -46,6 +46,14 @@ public class Group {
 
     public int getTotalServiceCount() {
         return activeServices.size() + preparedServices.size();
+    }
+
+    public GroupOptions getGroupOptions() {
+        return groupOptions;
+    }
+
+    public JVMOptions getJVMOptions() {
+        return jvmOptions;
     }
 
 }

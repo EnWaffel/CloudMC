@@ -2,6 +2,7 @@ package net.projectp.cloudmc.service;
 
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;
+import net.projectp.cloudmc.B;
 import net.projectp.cloudmc.cloud.CloudSystem;
 import net.projectp.cloudmc.group.Group;
 import net.projectp.cloudmc.jvm.JVM;
@@ -18,11 +19,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-public class ServiceFactory {
+public class ServiceFactory extends B {
 
     public static String defaultServerFileDownloadLink = "https://download.getbukkit.org/";
 
-    private final CloudSystem cloud;
+
+    private final PreparingFactory preparingFactory;
     private final HashMap<UUID, Service> activeServices = new HashMap<>();
     private final HashMap<UUID, PreparedService> preparedServices = new HashMap<>();
 
@@ -33,7 +35,8 @@ public class ServiceFactory {
     private boolean starting = false;
 
     public ServiceFactory(CloudSystem cloud) {
-        this.cloud = cloud;
+        super(cloud);
+        this.preparingFactory = new PreparingFactory(cloud);
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -115,6 +118,10 @@ public class ServiceFactory {
 
     private void createEula(String path) {
         FileUtil.writeFile("eula=true", new FileOrPath(path + "/eula.txt"));
+    }
+
+    public PreparingFactory getPreparingFactory() {
+        return preparingFactory;
     }
 
 }

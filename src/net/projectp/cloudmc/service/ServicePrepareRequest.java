@@ -28,4 +28,13 @@ public class ServicePrepareRequest extends Request<ServicePreparedCallback> {
         return serviceType;
     }
 
+    @Override
+    public String toString() {
+        return "ServicePrepareRequest{" +
+                "group=" + group.getName() +
+                ", type=" + type +
+                ", serviceType=" + serviceType +
+                '}';
+    }
+
 }
