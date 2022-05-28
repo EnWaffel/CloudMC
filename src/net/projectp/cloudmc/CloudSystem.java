@@ -13,8 +13,10 @@ import net.projectp.cloudmc.main.Main;
 import net.projectp.cloudmc.service.ServiceFactory;
 import net.projectp.cloudmc.util.result.Success;
 import org.json.JSONObject;
+import org.kohsuke.github.GitHub;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 
 public class CloudSystem {
 
+    private final GitHub gitHub;
     private final HashMap<String, JSONObject> configs = new HashMap<>();
 
     private final Logger logger;
@@ -33,14 +36,15 @@ public class CloudSystem {
 
     private final String version = "0.0.01";
 
-    public CloudSystem() {
+    public CloudSystem() throws IOException {
+        this.gitHub = GitHub.connect();
         this.logger = new Logger(this);
         this.console = new CommandConsole(this);
         this.serviceFactory = new ServiceFactory(this);
         load();
     }
 
-    private void load() {
+    private void load() throws IOException {
         logger.i("loading...");
         loadFiles();
         // welcome text
@@ -69,7 +73,7 @@ public class CloudSystem {
 
     // file stuff
 
-    private void loadFiles() {
+    private void loadFiles() throws IOException {
         String defaultURL = "https://assets.bierfrust.de/webservice/cloudmc/";
         logger.i("loading files...");
         createFolders("groups", "modules", "services", "services/temp", "services/static");
@@ -80,9 +84,9 @@ public class CloudSystem {
                 .put("startArgs", "java -Xmx%maxRam%MB -jar spigot.jar")
         ), new FileOrPath("config.json"), !new FileOrPath("config.json").getFile().exists());
         loadConfigs(new FileOrPath("config.json"));
-
+        System.out.println(gitHub.getRepository("CloudMC").getLatestRelease().getTagName());
         if (!"".equals(Main.getVersion())) {
-            logger.w("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/");
+            logger.w("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/latest");
         } else {
             logger.i("Everything is up to date!");
         }

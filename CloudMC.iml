@@ -10,5 +10,6 @@
     <orderEntry type="library" name="json-20210307" level="project" />
     <orderEntry type="library" name="randomutils-utils" level="project" />
     <orderEntry type="library" name="ProjectPUtils" level="project" />
+    <orderEntry type="library" name="kohsuke.github.api" level="project" />
   </component>
 </module>
