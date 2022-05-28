@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="randomutils-utils">
     <CLASSES>
-      <root url="jar://$USER_HOME$/Downloads/randomutils-utils.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../random-utilities/out/artifacts/randomutils_utils/randomutils-utils.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

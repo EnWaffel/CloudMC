@@ -1,1 +1,1 @@
-{"server":{"ip":"localhost","linux-startArgs":"#!/bin/bash\n java -Xmx%maxRam%MB -jar spigot.jar","windows-startArgs":"java -Xmx%maxRam%MB -jar spigot.jar"}}
+{"server":{"startArgs":"java -Xmx%maxRam%MB -jar spigot.jar","ip":"localhost"}}

@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: net.projectp.cloudmc.main.Main
+Main-Class: de.enwaffel.cloudmc.main.Main
 

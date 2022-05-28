@@ -1,0 +1,9 @@
+{
+	"name": "test",
+	"versionType": "spigot",
+	"version": "1.16.5",
+	"serverType": 0,
+	"jvm": {
+		"maxMemory": 512
+	}	
+}

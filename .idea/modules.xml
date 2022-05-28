@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CloudMC.iml" filepath="$PROJECT_DIR$/CloudMC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CloudMCAPI_SPIGOT/CloudMCAPI_SPIGOT.iml" filepath="$PROJECT_DIR$/CloudMCAPI_SPIGOT/CloudMCAPI_SPIGOT.iml" />
     </modules>
   </component>
 </project>
