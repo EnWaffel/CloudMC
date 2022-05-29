@@ -7,14 +7,7 @@
       </element>
       <element id="module-output" name="CloudMCAPI_SPIGOT" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/json-20210307.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/kohsuke/github-api/1.306/github-api-1.306.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.9/commons-lang3-3.9.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.13.2.2/jackson-databind-2.13.2.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.13.2/jackson-annotations-2.13.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.13.2/jackson-core-2.13.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.8.0/commons-io-2.8.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/ProjectPUtils.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/versions/spigot-1.16.5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../random-utilities/out/artifacts/randomutils_utils/randomutils-utils.jar" path-in-jar="/" />
     </root>
   </artifact>

@@ -1,3 +1,4 @@
 main: de.enwaffel.cloudmc.api.spigot.Main
 name: CloudMC-API
 version: 1.0
+load: POSTWORLD

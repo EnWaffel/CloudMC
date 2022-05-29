@@ -8,12 +8,13 @@ import de.enwaffel.cloudmc.util.result.Success;
 import de.enwaffel.randomutils.buff.InByteBuffer;
 import de.enwaffel.randomutils.file.FileOrPath;
 
-import java.io.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class JVM extends B {
 
     private Process jvmProcess;
-    private Thread thread;
+    //private Thread thread;
 
     public JVM(CloudSystem cloud) {
         super(cloud);
@@ -26,8 +27,22 @@ public class JVM extends B {
             ProcessBuilder builder = new ProcessBuilder(commands);
             builder.directory(fileOrPath.getFile().getParentFile());
             jvmProcess = builder.start();
-            thread = new Thread(this::runThread);
-            thread.start();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        jvmProcess.waitFor();
+                        jvmProcess.destroy();
+                        if (cloud.isShuttingDown()) {
+                            cloud.setServicesToWaitFor(cloud.getServicesToWaitFor()-1);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            },0, 1);
+            //thread = new Thread(this::runThread);
+            //thread.start();
         } catch (Exception e) {
             cloud.getLogger().e("Failed to start jvm.");
             cloud.getLogger().ex(Thread.currentThread(), e);

@@ -22,6 +22,7 @@ public class Main extends JavaPlugin {
         client = new Client("localhost", 49152);
         client.connect();
         client.createChannel("serviceCommunication");
+        client.getChannel("serviceCommunication").sendPacket(new JSONPacket(client.getChannel("serviceCommunication").info(), new JSONObject().put("serviceId", serviceId).put("action", "started")));
         client.getChannel("serviceCommunication").addHandle(new CIL() {
             @Override
             public void handle(ChannelInfo channelInfo, Packet<?> packet, String s) {
@@ -34,7 +35,7 @@ public class Main extends JavaPlugin {
                             break;
                         }
                         case "sendCommand": {
-                            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), data.getString("d"));
+                            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), data.getJSONObject("d").getString("text"));
                             break;
                         }
                     }
@@ -46,6 +47,7 @@ public class Main extends JavaPlugin {
 
             }
         });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> client.getChannel("serviceCommunication").sendPacket(new JSONPacket(client.getChannel("serviceCommunication").info(), new JSONObject().put("serviceId", serviceId).put("action", "stopped")))));
     }
 
     public static void main(String[] args) {

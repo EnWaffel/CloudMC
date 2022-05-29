@@ -11,6 +11,7 @@ import net.projectp.network.channel.ServerChannel;
 import net.projectp.network.packet.JSONPacket;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,10 +36,36 @@ public class Group extends B {
         return this;
     }
 
-    public void sendPacketToService(UUID uuid, JSONObject data) {
+    public void sendPacketToService(Service service, String action, JSONObject data) {
         ServerChannel channel = cloud.getNetworkServer().getChannel("serviceCommunication");
-        JSONPacket packet = new JSONPacket(channel.info(), new JSONObject().put("serviceId", uuid).put("sentData", data));
+        JSONPacket packet = new JSONPacket(channel.info(), new JSONObject().put("serviceId", service.getUUID()).put("action", action).put("d", data));
         channel.sendPacketGlobally(packet);
+    }
+
+    public void sendTextToService(Service service, String text) {
+        sendPacketToService(service, "sendCommand", new JSONObject().put("text", text));
+    }
+
+    public void shutdownService(Service service) {
+        sendPacketToService(service, "shutdown", new JSONObject());
+    }
+
+    public PreparedService getPreparedServiceByName(String name) {
+        for (PreparedService preparedService : preparedServices) {
+            if (preparedService.name().equals(name)) {
+                return preparedService;
+            }
+        }
+        return null;
+    }
+
+    public void stopService(Service service) {
+        activeServices.remove(service);
+        cloud.getNetworkServer().getClients().remove(service.getNetworkClient());
+        if (groupOptions.getServerType() == 0) {
+            new File(service.getWorkingFolder()).delete();
+            cloud.getLogger().i("Service Deleted [" + groupOptions.getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+        }
     }
 
     public String getName() {

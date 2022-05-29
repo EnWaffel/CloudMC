@@ -16,6 +16,11 @@ import de.enwaffel.cloudmc.service.ServiceFactory;
 import de.enwaffel.cloudmc.task.Scheduler;
 import de.enwaffel.cloudmc.util.Util;
 import de.enwaffel.cloudmc.version.VersionManager;
+import net.projectp.network.channel.ChannelInfo;
+import net.projectp.network.channel.SCIL;
+import net.projectp.network.packet.JSONPacket;
+import net.projectp.network.packet.Packet;
+import net.projectp.network.server.ClientConnection;
 import net.projectp.network.server.Server;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class CloudSystem {
 
@@ -43,6 +49,8 @@ public class CloudSystem {
     private final List<EventListener> eventListeners = new ArrayList<>();
 
     private final String version = "0.0.01";
+    private boolean shuttingDown = false;
+    private volatile int servicesToWaitFor = 0;
 
     public CloudSystem() throws IOException {
         this.logger = new Logger(this);
@@ -107,7 +115,7 @@ public class CloudSystem {
         loadConfigs(new FileOrPath("config.json"));
         logger.i("Loading groups...");
 
-        for (File _group : new File("groups").listFiles()) {
+        for (File _group : Objects.requireNonNull(new File("groups").listFiles())) {
             if (_group.isFile()) {
                 if (net.projectp.util.Util.validExtension(_group.getPath(), "json")) {
                     groups.add(Group.fromJson(this, FileUtil.readJSON(new FileOrPath(_group))));
@@ -120,6 +128,49 @@ public class CloudSystem {
         this.networkServer = new Server(49152);
         networkServer.open();
         networkServer.createChannel("serviceCommunication");
+        networkServer.getChannel("serviceCommunication").addHandle(new SCIL() {
+            @Override
+            public void handle(ClientConnection clientConnection, ChannelInfo channelInfo, Packet<?> packet, String s) {
+                if (packet instanceof JSONPacket) {
+                    JSONPacket packet1 = (JSONPacket) packet;
+                    JSONObject data = packet1.getData();
+                    switch (data.getString("action")) {
+                        case "started": {
+                            for (Group group : groups) {
+                                for (Service service : group.getActiveServices()) {
+                                    if  (service.getUUID().toString().equals(data.getString("serviceId"))) {
+                                        service.setNetworkClient(clientConnection);
+                                        service.setConnected(true);
+                                        logger.i("Service Connected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case "stopped": {
+                            for (Group group : groups) {
+                                for (int i = 0; i < group.getActiveServices().size();i++) {
+                                    Service service = group.getActiveServices().get(i);
+                                    if (service != null) {
+                                        if  (service.getUUID().toString().equals(data.getString("serviceId"))) {
+                                            service.setConnected(false);
+                                            logger.i("Service Disconnected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+                                            group.stopService(service);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void handleRaw(byte[] bytes, String s) {
+
+            }
+        });
 
         if (!versionCfg.getString("version").equals(Main.getVersion())) {
             logger.w("Hey there, you are running an outdated version of CloudMC! Download a new build here: https://github.com/EnWaffel/CloudMC/releases/latest");
@@ -188,13 +239,16 @@ public class CloudSystem {
     }
 
     public void shutdown() {
+        shuttingDown = true;
         logger.i("Shutting down...");
         logger.i("Stopping services...");
         for (Group group : groups) {
             for (Service service : group.getActiveServices()) {
-                service.getJVM().stop(false);
+                servicesToWaitFor++;
+                service.getGroup().shutdownService(service);
             }
         }
+        while (servicesToWaitFor > 0) Thread.onSpinWait();
     }
 
     // getters / setters
@@ -231,6 +285,14 @@ public class CloudSystem {
         return groups;
     }
 
+    public boolean isShuttingDown() {
+        return shuttingDown;
+    }
+
+    public int getServicesToWaitFor() {
+        return servicesToWaitFor;
+    }
+
     public boolean groupExists(String name) {
         return getGroup(name) != null;
     }
@@ -245,5 +307,10 @@ public class CloudSystem {
     }
 
     //public String getVersion() { return getConfig("version").getString("version"); }
+
+
+    public void setServicesToWaitFor(int servicesToWaitFor) {
+        this.servicesToWaitFor = servicesToWaitFor;
+    }
 
 }

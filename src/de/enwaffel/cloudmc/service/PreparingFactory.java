@@ -6,6 +6,7 @@ import de.enwaffel.cloudmc.group.Group;
 import de.enwaffel.cloudmc.util.Util;
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,16 +49,22 @@ public class PreparingFactory extends B {
             int type = group.getGroupOptions().getServerType();
             UUID id = UUID.randomUUID();
             int serviceNumber = request.getGroup().getTotalServiceCount() + 1;
+            for (PreparedService preparedService : group.getPreparedServices()) {
+                if (preparedService.name().equals(group.getName() + "-" + serviceNumber)) {
+                    cloud.getLogger().e("Service is already prepared: '" + group.getName() + "-" + serviceNumber + "'!");
+                    return;
+                }
+            }
             String path = type == 0 ? "services/temp/" + group.getName() + "-" + serviceNumber + "-" + id : "services/static/" + group.getName() + "-" + serviceNumber;
 
-            cloud.getLogger().i("Preparing Service [type: " + group.getGroupOptions().getVersion().getProvider().getName() + "/" + group.getName() + "-" + serviceNumber + " (" + id + ")]");
+            cloud.getLogger().i("Preparing Service ["+ group.getGroupOptions().getVersion().getProvider().getName() + "/" + group.getName() + "-" + serviceNumber + " (" + id + ")]");
+            PreparedService preparedService = new PreparedService(cloud, group, id, serviceNumber, path);
 
             if (!new File(path).exists()) {
-                copyTemplate(group, path, true);
+                copyTemplate(group, path, true, preparedService);
             } else {
-                copyTemplate(group, path, false);
+                copyTemplate(group, path, false, preparedService);
             }
-            PreparedService preparedService = new PreparedService(cloud, group, id, serviceNumber, path);
             group.getPreparedServices().add(preparedService);
             request.getCallback().finish(preparedService);
         } catch (Exception e) {
@@ -65,7 +72,7 @@ public class PreparingFactory extends B {
         }
     }
 
-    private void copyTemplate(Group group, String path, boolean copyDefaultTemplate) throws IOException {
+    private void copyTemplate(Group group, String path, boolean copyDefaultTemplate, PreparedService preparedService) throws IOException {
         String templatePath = "templates/" + group.getName();
         new File(path).mkdirs();
         new File(path + "/plugins").mkdirs();
@@ -76,6 +83,7 @@ public class PreparingFactory extends B {
         }
 
         //Util.createIfNotExist(new File(jarPath));
+        FileUtil.writeFile(new JSONObject().put("serviceId", preparedService.getUUID().toString()), new FileOrPath(path + "/.service"));
         FileUtil.writeFile("eula=true", new FileOrPath(path + "/eula.txt"));
         Util.copyIfNotExist("versions/" + group.getGroupOptions().getVersion().getName() + ".jar", jarPath);
         Util.copyIfNotExist("C:/Users/leoar/OneDrive/Desktop/JavaStuff/CloudMC/out/artifacts/SpigotAPI/CloudMCAPI.jar", path + "/plugins/CloudMCAPI.jar");

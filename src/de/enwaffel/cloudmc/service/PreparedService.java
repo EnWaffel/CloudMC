@@ -37,4 +37,8 @@ public class PreparedService extends B {
         return workingFolder;
     }
 
+    public String name() {
+        return group.getName() + "-" + serviceNumber;
+    }
+
 }
