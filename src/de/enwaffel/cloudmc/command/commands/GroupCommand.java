@@ -8,6 +8,9 @@ import de.enwaffel.cloudmc.util.result.Fail;
 import de.enwaffel.cloudmc.util.result.Success;
 import de.enwaffel.cloudmc.command.CommandExecutor;
 import de.enwaffel.cloudmc.command.ConsoleOutput;
+import de.enwaffel.randomutils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileUtil;
+import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,65 +26,61 @@ public class GroupCommand extends B implements CommandExecutor {
         if (args.length > 0) {
             switch (args[0].toLowerCase()) {
                 case "create": {
-                    AtomicReference<String> storedName = new AtomicReference<>("");
-                    AtomicInteger storedServerType = new AtomicInteger(-1);
-                    AtomicInteger storedType = new AtomicInteger(-1);
-                    AtomicReference<String> storedVersion = new AtomicReference<>("");
-                    AtomicInteger storedMaxMemory = new AtomicInteger(-1);
-                    AtomicInteger storedMinServices = new AtomicInteger(-1);
+                    AtomicReference<String> name = new AtomicReference<>("");
+                    AtomicReference<String> versionType = new AtomicReference<>("");
+                    AtomicReference<String> version = new AtomicReference<>("");
+                    AtomicInteger serverType = new AtomicInteger(-1);
+                    AtomicInteger maxMemory = new AtomicInteger(-1);
+                    AtomicInteger minServices = new AtomicInteger(-1);
 
                     QuestionSequence sequence = new QuestionSequence((i, text) -> {
                         switch (i) {
                             case -1: {
                                 output.info("Creating group...");
+                                JSONObject o = new JSONObject();
+                                o.put("name", name);
+                                o.put("versionType", versionType);
+                                o.put("version", version);
+                                o.put("serverType", serverType);
+                                o.put("minServices", minServices);
+                                o.put("jvm", new JSONObject().put("maxMemory", maxMemory));
+                                FileUtil.writeFile(o, FileOrPath.path("groups/" + name + ".json"));
                                 return new Success();
                             }
                             case 0: {
                                 if (!text.contains(" ")) {
-                                    storedName.set(text);
+                                    name.set(text);
                                     return new Success();
                                 } else {
                                     return new Fail("Name cannot contain spaces!");
                                 }
                             }
                             case 1: {
-                                switch (text.toLowerCase()) {
-                                    case "spigot": {
-                                        storedServerType.set(1);
-                                        return new Success();
-                                    }
-                                    case "bukkit": {
-                                        storedServerType.set(0);
-                                        return new Success();
-                                    }
-                                    case "bungeecord": {
-                                        storedServerType.set(2);
-                                        return new Success();
-                                    }
-                                    default: return new Fail("Invalid Sever-Type!");
-                                }
+                                versionType.set(text);
+                                return new Success();
                             }
                             case 2: {
                                 switch (text.toLowerCase()) {
                                     case "dynamic": {
-                                        storedType.set(0);
+                                        serverType.set(0);
                                         return new Success();
                                     }
                                     case "static": {
-                                        storedType.set(1);
+                                        serverType.set(1);
                                         return new Success();
                                     }
                                     default: return new Fail("");
                                 }
                             }
                             case 3: {
+                                version.set(text);
                                 return new Success();
                             }
                             case 4: {
                                 Integer num = Util.isNumber(text);
                                 if (num != null) {
                                     if (num > 0) {
-                                        storedMaxMemory.set(num);
+                                        maxMemory.set(num);
                                     } else {
                                         return new Fail("Argument cannot be lower than 1!");
                                     }
@@ -94,7 +93,7 @@ public class GroupCommand extends B implements CommandExecutor {
                                 Integer num = Util.isNumber(text);
                                 if (num != null) {
                                     if (num > -1) {
-                                        storedMinServices.set(num);
+                                        minServices.set(num);
                                     } else {
                                         return new Fail("Argument cannot be lower than 0!");
                                     }

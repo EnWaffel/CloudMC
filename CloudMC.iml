@@ -11,5 +11,6 @@
     <orderEntry type="library" name="ProjectPUtils" level="project" />
     <orderEntry type="library" name="kohsuke.github.api" level="project" />
     <orderEntry type="library" name="randomutils-utils" level="project" />
+    <orderEntry type="library" name="yaml.snakeyaml" level="project" />
   </component>
 </module>

@@ -17,6 +17,7 @@ public class HelpCommand extends B implements CommandExecutor {
         output.info("- help (help, info, h, i)");
         output.info("- group <create, modify, delete>");
         output.info("- service <start, stop>");
+        output.info("- copy <service> --- Copies the running service to the group template.");
     }
 
 }

@@ -1,0 +1,10 @@
+{
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:mountains": "2022-07-14 12:55:16 +0200",
+      "minecraft:plains": "2022-07-14 12:54:10 +0200"
+    },
+    "done": false
+  },
+  "DataVersion": 2586
+}

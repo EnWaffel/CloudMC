@@ -10,26 +10,34 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class Main extends JavaPlugin {
 
     private String serviceId;
+    private int serverType;
     private Client client;
+    private boolean connected = false;
 
     @Override
     public void onEnable() {
         super.onEnable();
-        serviceId = Util.readFileToJSON(".service").getString("serviceId");
+        JSONObject object = Util.readFileToJSON(".service");
+        serviceId = object.getString("serviceId");
+        serverType = object.getInt("type");
         client = new Client("localhost", 49152);
         client.connect();
-        client.createChannel("serviceCommunication");
-        client.getChannel("serviceCommunication").sendPacket(new JSONPacket(client.getChannel("serviceCommunication").info(), new JSONObject().put("serviceId", serviceId).put("action", "started")));
-        client.getChannel("serviceCommunication").addHandle(new CIL() {
+        client.getDefaultChannel().addHandle(new CIL() {
             @Override
             public void handle(ChannelInfo channelInfo, Packet<?> packet, String s) {
                 JSONPacket packet1 = (JSONPacket) packet;
                 JSONObject data = packet1.getData();
                 if (data.getString("serviceId").equals(serviceId)) {
                     switch (data.getString("action")) {
+                        case "connected": {
+                            connected = true;
+                        }
                         case "shutdown": {
                             Bukkit.shutdown();
                             break;
@@ -47,7 +55,18 @@ public class Main extends JavaPlugin {
 
             }
         });
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> client.getChannel("serviceCommunication").sendPacket(new JSONPacket(client.getChannel("serviceCommunication").info(), new JSONObject().put("serviceId", serviceId).put("action", "stopped")))));
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!connected) {
+                    client.getDefaultChannel().sendPacket(new JSONPacket(client.getDefaultChannel().info(), new JSONObject().put("type", "serviceCommunication").put("serviceId", serviceId).put("action", "started")));
+                } else {
+                    cancel();
+                }
+            }
+        }, 0, 3000);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> client.getDefaultChannel().sendPacket(new JSONPacket(client.getDefaultChannel().info(), new JSONObject().put("type", "serviceCommunication").put("serviceId", serviceId).put("action", "stopped")))));
     }
 
     public static void main(String[] args) {

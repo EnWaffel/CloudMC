@@ -67,6 +67,8 @@ public class PreparingFactory extends B {
             }
             group.getPreparedServices().add(preparedService);
             request.getCallback().finish(preparedService);
+            queue.remove(request);
+            working = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,11 +84,10 @@ public class PreparingFactory extends B {
             Files.copy(Paths.get(templatePath), Paths.get(path), StandardCopyOption.REPLACE_EXISTING);
         }
 
-        //Util.createIfNotExist(new File(jarPath));
-        FileUtil.writeFile(new JSONObject().put("serviceId", preparedService.getUUID().toString()), new FileOrPath(path + "/.service"));
-        FileUtil.writeFile("eula=true", new FileOrPath(path + "/eula.txt"));
+        FileUtil.writeFile(new JSONObject().put("serviceId", preparedService.getUUID().toString()).put("type", preparedService.getGroup().getGroupOptions().getServerType()), FileOrPath.path(path + "/.service"));
+        FileUtil.writeFile("eula=true", FileOrPath.path(path + "/eula.txt"));
         Util.copyIfNotExist("versions/" + group.getGroupOptions().getVersion().getName() + ".jar", jarPath);
-        Util.copyIfNotExist("C:/Users/leoar/OneDrive/Desktop/JavaStuff/CloudMC/out/artifacts/SpigotAPI/CloudMCAPI.jar", path + "/plugins/CloudMCAPI.jar");
+        Util.copyIfNotExist("CloudMCAPI.jar", path + "/plugins/CloudMCAPI.jar");
     }
 
 }

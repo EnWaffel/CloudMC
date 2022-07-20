@@ -11,7 +11,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.13.2/jackson-annotations-2.13.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-core/2.13.2/jackson-core-2.13.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.8.0/commons-io-2.8.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/../../random-utilities/out/artifacts/randomutils_utils/randomutils-utils.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../random-utilities/out/artifacts/randomutils_utils/randomutils-utils.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

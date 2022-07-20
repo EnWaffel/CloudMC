@@ -1,21 +1,20 @@
 package de.enwaffel.cloudmc;
 
-import de.enwaffel.cloudmc.command.commands.ServiceCommand;
-import de.enwaffel.cloudmc.service.Service;
-import de.enwaffel.randomutils.file.FileOrPath;
-import de.enwaffel.randomutils.file.FileUtil;
 import de.enwaffel.cloudmc.api.event.Event;
 import de.enwaffel.cloudmc.api.event.EventHandler;
 import de.enwaffel.cloudmc.api.event.EventListener;
 import de.enwaffel.cloudmc.command.CommandConsole;
-import de.enwaffel.cloudmc.command.commands.GroupCommand;
-import de.enwaffel.cloudmc.command.commands.HelpCommand;
+import de.enwaffel.cloudmc.command.commands.*;
 import de.enwaffel.cloudmc.group.Group;
 import de.enwaffel.cloudmc.main.Main;
+import de.enwaffel.cloudmc.service.Service;
 import de.enwaffel.cloudmc.service.ServiceFactory;
 import de.enwaffel.cloudmc.task.Scheduler;
 import de.enwaffel.cloudmc.util.Util;
 import de.enwaffel.cloudmc.version.VersionManager;
+import de.enwaffel.randomutils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileUtil;
+import net.projectp.callback.Callback;
 import net.projectp.network.channel.ChannelInfo;
 import net.projectp.network.channel.SCIL;
 import net.projectp.network.packet.JSONPacket;
@@ -26,13 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CloudSystem {
 
@@ -51,8 +46,9 @@ public class CloudSystem {
     private final String version = "0.0.01";
     private boolean shuttingDown = false;
     private volatile int servicesToWaitFor = 0;
+    private String welcomeText = "";
 
-    public CloudSystem() throws IOException {
+    public CloudSystem() {
         this.logger = new Logger(this);
         this.console = new CommandConsole(this);
         this.serviceFactory = new ServiceFactory(this);
@@ -61,19 +57,11 @@ public class CloudSystem {
         load();
     }
 
-    private void load() throws IOException {
+    private void load() {
         logger.i("loading...");
         loadFiles();
         // welcome text
-        logger.i(
-                "Enabling:\n   _____   _                       _   __  __    _____      ___        _____       ______ \n" +
-                        "  / ____| | |                     | | |  \\/  |  / ____|    / _ \\      | ____|     |____  |\n" +
-                        " | |      | |   ___    _   _    __| | | \\  / | | |        | | | |     | |__           / / \n" +
-                        " | |      | |  / _ \\  | | | |  / _` | | |\\/| | | |        | | | |     |___ \\         / /  \n" +
-                        " | |____  | | | (_) | | |_| | | (_| | | |  | | | |____    | |_| |  _   ___) |  _    / /   \n" +
-                        "  \\_____| |_|  \\___/   \\__,_|  \\__,_| |_|  |_|  \\_____|    \\___/  (_) |____/  (_)  /_/    \n" +
-                        "                                                                                          \n" +
-                        "                                                                                          ");
+        logger.i(welcomeText);
 
         // internal commands
 
@@ -83,12 +71,15 @@ public class CloudSystem {
         console.registerCommand("i", new HelpCommand(this));
         console.registerCommand("group", new GroupCommand(this));
         console.registerCommand("service", new ServiceCommand(this));
+        console.registerCommand("stop", new StopCommand(this));
+        console.registerCommand("copy", new CopyCommand(this));
     }
 
     // file stuff
 
-    private void loadFiles() throws IOException {
+    private void loadFiles() {
         String defaultURL = "https://assets.bierfrust.de/webservice/cloudmc/";
+        welcomeText = "\n" + Util.readFromUrl(defaultURL + "welcometext.txt");
         logger.i("loading files...");
         createFolders("groups", "modules", "services", "services/temp", "services/static", "versions");
         JSONObject versionCfg = Util.readJsonFromUrl(defaultURL + "version.json");
@@ -110,15 +101,15 @@ public class CloudSystem {
         FileUtil.writeFileIf(new JSONObject().put("server", new JSONObject()
                 .put("ip", "localhost")
                 .put("startArgs", "java -Xmx%maxRam%MB -jar spigot.jar")
-        ), new FileOrPath("config.json"), !new FileOrPath("config.json").getFile().exists());
+        ), FileOrPath.path("config.json"), !FileOrPath.path("config.json").getFile().exists());
         logger.i("Loading configs...");
-        loadConfigs(new FileOrPath("config.json"));
+        loadConfigs(FileOrPath.path("config.json"));
         logger.i("Loading groups...");
 
         for (File _group : Objects.requireNonNull(new File("groups").listFiles())) {
             if (_group.isFile()) {
                 if (net.projectp.util.Util.validExtension(_group.getPath(), "json")) {
-                    groups.add(Group.fromJson(this, FileUtil.readJSON(new FileOrPath(_group))));
+                    groups.add(Group.fromJson(this, FileUtil.readJSON(FileOrPath.file(_group))));
                 } else {
                     logger.e("File: '" + _group.getPath() + "' is not a json file!");
                 }
@@ -127,40 +118,43 @@ public class CloudSystem {
         logger.i("Starting network server...");
         this.networkServer = new Server(49152);
         networkServer.open();
-        networkServer.createChannel("serviceCommunication");
-        networkServer.getChannel("serviceCommunication").addHandle(new SCIL() {
+        networkServer.getDefaultChannel().addHandle(new SCIL() {
             @Override
             public void handle(ClientConnection clientConnection, ChannelInfo channelInfo, Packet<?> packet, String s) {
                 if (packet instanceof JSONPacket) {
                     JSONPacket packet1 = (JSONPacket) packet;
                     JSONObject data = packet1.getData();
-                    switch (data.getString("action")) {
-                        case "started": {
-                            for (Group group : groups) {
-                                for (Service service : group.getActiveServices()) {
-                                    if  (service.getUUID().toString().equals(data.getString("serviceId"))) {
-                                        service.setNetworkClient(clientConnection);
-                                        service.setConnected(true);
-                                        logger.i("Service Connected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                        case "stopped": {
-                            for (Group group : groups) {
-                                for (int i = 0; i < group.getActiveServices().size();i++) {
-                                    Service service = group.getActiveServices().get(i);
-                                    if (service != null) {
+                    if (data.getString("type").equals("serviceCommunication")) {
+                        switch (data.getString("action")) {
+                            case "started": {
+                                for (Group group : groups) {
+                                    for (Service service : group.getActiveServices()) {
                                         if  (service.getUUID().toString().equals(data.getString("serviceId"))) {
-                                            service.setConnected(false);
-                                            logger.i("Service Disconnected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
-                                            group.stopService(service);
+                                            service.setNetworkClient(clientConnection);
+                                            service.setConnected(true);
+                                            networkServer.getDefaultChannel().sendPacket(clientConnection, new JSONPacket(networkServer.getDefaultChannel().info(), new JSONObject().put("type", "serviceCommunication").put("action", "connected")));
+                                            logger.i("Service Connected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
                                         }
                                     }
                                 }
+                                break;
                             }
-                            break;
+                            case "stopped": {
+                                for (Group group : groups) {
+                                    for (int i = 0; i < group.getActiveServices().size();i++) {
+                                        Service service = group.getActiveServices().get(i);
+                                        if (service != null) {
+                                            if  (service.getUUID().toString().equals(data.getString("serviceId"))) {
+                                                service.setConnected(false);
+                                                logger.i("Service Disconnected [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+                                                group.stopService(service);
+                                                servicesToWaitFor--;
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
                         }
                     }
                 }
@@ -239,16 +233,27 @@ public class CloudSystem {
     }
 
     public void shutdown() {
-        shuttingDown = true;
-        logger.i("Shutting down...");
-        logger.i("Stopping services...");
-        for (Group group : groups) {
-            for (Service service : group.getActiveServices()) {
-                servicesToWaitFor++;
-                service.getGroup().shutdownService(service);
+        if (!shuttingDown) {
+            shuttingDown = true;
+            logger.i("Shutting down...");
+            logger.i("Stopping services...");
+            for (Group group : groups) {
+                for (int i = 0;i < group.getActiveServices().size();i++) {
+                    Service service = group.getActiveServices().get(i);
+                    if (service != null) {
+                        if (service.isConnected()) {
+                            servicesToWaitFor++;
+                            service.getGroup().shutdownService(service);
+                        } else {
+                            service.getJVM().stop(false);
+                            group.stopService(service);
+                        }
+                    }
+                }
             }
+            while (servicesToWaitFor > 0) Thread.onSpinWait();
+            System.exit(0);
         }
-        while (servicesToWaitFor > 0) Thread.onSpinWait();
     }
 
     // getters / setters

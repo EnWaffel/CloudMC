@@ -2,19 +2,19 @@ package de.enwaffel.cloudmc.group;
 
 import de.enwaffel.cloudmc.B;
 import de.enwaffel.cloudmc.CloudSystem;
+import de.enwaffel.cloudmc.jvm.JVMOptions;
 import de.enwaffel.cloudmc.service.PreparedService;
 import de.enwaffel.cloudmc.service.Service;
-import de.enwaffel.cloudmc.jvm.JVMOptions;
 import de.enwaffel.cloudmc.version.Version;
 import de.enwaffel.cloudmc.version.VersionProvider;
 import net.projectp.network.channel.ServerChannel;
 import net.projectp.network.packet.JSONPacket;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Group extends B {
 
@@ -37,7 +37,7 @@ public class Group extends B {
     }
 
     public void sendPacketToService(Service service, String action, JSONObject data) {
-        ServerChannel channel = cloud.getNetworkServer().getChannel("serviceCommunication");
+        ServerChannel channel = cloud.getNetworkServer().getDefaultChannel();
         JSONPacket packet = new JSONPacket(channel.info(), new JSONObject().put("serviceId", service.getUUID()).put("action", action).put("d", data));
         channel.sendPacketGlobally(packet);
     }
@@ -62,9 +62,14 @@ public class Group extends B {
     public void stopService(Service service) {
         activeServices.remove(service);
         cloud.getNetworkServer().getClients().remove(service.getNetworkClient());
+        service.getJVM().stop(false);
         if (groupOptions.getServerType() == 0) {
-            new File(service.getWorkingFolder()).delete();
-            cloud.getLogger().i("Service Deleted [" + groupOptions.getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+            try {
+                FileDeleteStrategy.FORCE.delete(new File(service.getWorkingFolder()));
+                cloud.getLogger().i("Service Deleted [" + groupOptions.getVersion().getProvider().getName() + "/" + service.name() + " (" + service.getUUID() + ")]");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -92,6 +97,10 @@ public class Group extends B {
         return jvmOptions;
     }
 
+    public String getTemplateFolder() {
+        return "templates/" + name;
+    }
+
     public static Group fromJson(CloudSystem cloud, JSONObject json) {
         Group group = new Group(cloud, json.getString("name"));
         JSONObject _jvmOptions = json.getJSONObject("jvm");
@@ -111,6 +120,18 @@ public class Group extends B {
 
         group.setOptions(groupOptions, jvmOptions);
         return group;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "name='" + name + '\'' +
+                ", activeServices=" + activeServices +
+                ", preparedServices=" + preparedServices +
+                ", groupOptions=" + groupOptions +
+                ", jvmOptions=" + jvmOptions +
+                ", cloud=" + cloud +
+                '}';
     }
 
 }

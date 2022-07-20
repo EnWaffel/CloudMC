@@ -6,11 +6,10 @@ import de.enwaffel.cloudmc.group.Group;
 import de.enwaffel.cloudmc.jvm.JVM;
 import de.enwaffel.cloudmc.util.Util;
 import de.enwaffel.randomutils.file.FileOrPath;
+import de.enwaffel.randomutils.file.FileUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.File;
+import java.util.*;
 
 public class StartingFactory extends B {
 
@@ -41,22 +40,40 @@ public class StartingFactory extends B {
 
     private void work(ServiceStartRequest request) {
         PreparedService preparedService = request.getPreparedService();
-        Group group = request.getPreparedService().getGroup();
-        for (Service service : group.getActiveServices()) {
-            if (service.name().equals(preparedService.name())) {
-                cloud.getLogger().e("Service is already running: '" + preparedService.name() + "'!");
-                return;
+        try {
+            Group group = request.getPreparedService().getGroup();
+            for (Service service : group.getActiveServices()) {
+                if (service.name().equals(preparedService.name())) {
+                    cloud.getLogger().e("Service is already running: '" + preparedService.name() + "'!");
+                    return;
+                }
             }
+            cloud.getLogger().i("Starting Service [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + preparedService.name() + " (" + preparedService.getUUID() + ")]");
+            group.getPreparedServices().remove(preparedService);
+            String path = preparedService.getWorkingFolder();
+            String jarPath = path + "/" + preparedService.getGroup().getGroupOptions().getVersion().getName() + ".jar";
+            JVM jvm = new JVM(cloud);
+            Service service = new Service(cloud, preparedService.getGroup(), preparedService.getUUID(), preparedService.getServiceNumber(), preparedService.getWorkingFolder(), jvm, Util.randomNumber(49153, 65535));
+
+            String filePath = preparedService.getWorkingFolder() + File.separator + "server.properties";
+            if (!new File(filePath).exists()) FileUtil.writeFile("", FileOrPath.path(filePath));
+
+            Properties properties = new Properties();
+            properties.load(FileUtil.getInputStream(FileOrPath.path(filePath)));
+
+            properties.setProperty("server-port", String.valueOf(service.getServerPort()));
+            properties.setProperty("online-mode", "false");
+
+            properties.store(FileUtil.getOutputStream(FileOrPath.path(filePath)), "");
+            jvm.start(FileOrPath.path(jarPath), new String[]{"-Xmx500MB", "-Dcom.mojang.eula.agree=true"}, "nogui", "-o false" ,"-p ", String.valueOf(service.getServerPort()));
+            request.getPreparedService().getGroup().getActiveServices().add(service);
+            request.getCallback().finish(service);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //--server-port
         }
-        cloud.getLogger().i("Starting Service [" + group.getGroupOptions().getVersion().getProvider().getName() + "/" + preparedService.name() + " (" + preparedService.getUUID() + ")]");
-        group.getPreparedServices().remove(preparedService);
-        String path = preparedService.getWorkingFolder();
-        String jarPath = path + "/" + preparedService.getGroup().getGroupOptions().getVersion().getName() + ".jar";
-        JVM jvm = new JVM(cloud);
-        Service service = new Service(cloud, preparedService.getGroup(), preparedService.getUUID(), preparedService.getServiceNumber(), preparedService.getWorkingFolder(), jvm, Util.randomNumber(49153, 65535));
-        request.getPreparedService().getGroup().getActiveServices().add(service);
-        jvm.start(new FileOrPath(jarPath), new String[]{"-Xmx500MB", "-Dcom.mojang.eula.agree=true"}, "nogui", "o false" ,"p " + service.getServerPort());
-        request.getCallback().finish(service);
+        queue.remove(request);
+        working = false;
     }
 
 }

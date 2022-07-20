@@ -24,7 +24,7 @@ public class VersionManager extends B {
         JSONArray versions = json.getJSONArray("versions");
         for (Object o : versions) {
             JSONObject obj = new JSONObject(o.toString());
-            Version v = new Version(provider, obj.getString("name"), obj.getString("prefix"));
+            Version v = new Version(provider, obj.getString("name"), obj.getString("prefix"), obj.getDouble("min-java-version"), obj.getDouble("max-java-version"));
             provider.getVersions().add(v);
         }
         this.versions.put(name, provider);

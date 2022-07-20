@@ -1,0 +1,3 @@
+main: de.enwaffel.cloudmc.api.bungeecord.Main
+name: CloudMCAPI
+version: 1.0

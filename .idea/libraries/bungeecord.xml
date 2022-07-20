@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bungeecord">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/versions/bungeecord.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

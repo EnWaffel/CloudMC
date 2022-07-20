@@ -1,0 +1,9 @@
+{
+  "server": {
+    "startArgs": "java -Xmx%maxRam%MB -jar spigot.jar",
+    "ip":"localhost"
+  },
+  "jvm": {
+    "installNotAvailableJVMs": false
+  }
+}

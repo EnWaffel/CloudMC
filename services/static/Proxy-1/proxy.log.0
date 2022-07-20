@@ -1,0 +1,85 @@
+00:50:45 [INFO] Using standard Java JCE cipher.
+00:50:45 [INFO] Using standard Java compressor.
+00:50:45 [INFO] Enabled BungeeCord version git:BungeeCord-Bootstrap:1.18-R0.1-SNAPSHOT:862bb2a:1636
+00:50:45 [INFO] Discovered module: ModuleSpec(name=cmd_alert, file=modules\cmd_alert.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Discovered module: ModuleSpec(name=cmd_find, file=modules\cmd_find.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Discovered module: ModuleSpec(name=cmd_list, file=modules\cmd_list.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Discovered module: ModuleSpec(name=cmd_send, file=modules\cmd_send.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Discovered module: ModuleSpec(name=cmd_server, file=modules\cmd_server.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Discovered module: ModuleSpec(name=reconnect_yaml, file=modules\reconnect_yaml.jar, provider=JenkinsModuleSource())
+
+00:50:45 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:45 [INFO] Attempting to Jenkins download module cmd_alert v1636
+
+00:50:46 [INFO] Download complete
+
+00:50:46 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:46 [INFO] Attempting to Jenkins download module cmd_find v1636
+
+00:50:46 [INFO] Download complete
+
+00:50:46 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:46 [INFO] Attempting to Jenkins download module cmd_list v1636
+
+00:50:46 [INFO] Download complete
+
+00:50:46 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:46 [INFO] Attempting to Jenkins download module cmd_send v1636
+
+00:50:46 [INFO] Download complete
+
+00:50:46 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:46 [INFO] Attempting to Jenkins download module cmd_server v1636
+
+00:50:47 [INFO] Download complete
+
+00:50:47 [INFO] Attempting to update plugin from null to ModuleVersion(build=1636, git=862bb2a)
+
+00:50:47 [INFO] Attempting to Jenkins download module reconnect_yaml v1636
+
+00:50:47 [INFO] Download complete
+
+00:50:47 [INFO] Loaded plugin reconnect_yaml version git:reconnect_yaml:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Loaded plugin cmd_find version git:cmd_find:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Loaded plugin cmd_server version git:cmd_server:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Loaded plugin cmd_alert version git:cmd_alert:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Loaded plugin cmd_send version git:cmd_send:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Loaded plugin cmd_list version git:cmd_list:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [WARNING] Error loading plugin CloudMC-API
+java.lang.NoClassDefFoundError: org/bukkit/plugin/java/JavaPlugin
+	at java.base/java.lang.ClassLoader.defineClass1(Native Method)
+	at java.base/java.lang.ClassLoader.defineClass(ClassLoader.java:1017)
+	at java.base/java.security.SecureClassLoader.defineClass(SecureClassLoader.java:151)
+	at net.md_5.bungee.api.plugin.PluginClassloader.findClass(PluginClassloader.java:152)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:589)
+	at net.md_5.bungee.api.plugin.PluginClassloader.loadClass0(PluginClassloader.java:66)
+	at net.md_5.bungee.api.plugin.PluginClassloader.loadClass(PluginClassloader.java:59)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:522)
+	at net.md_5.bungee.api.plugin.PluginManager.enablePlugin(PluginManager.java:340)
+	at net.md_5.bungee.api.plugin.PluginManager.loadPlugins(PluginManager.java:250)
+	at net.md_5.bungee.BungeeCord.start(BungeeCord.java:271)
+	at net.md_5.bungee.BungeeCordLauncher.main(BungeeCordLauncher.java:67)
+	at net.md_5.bungee.Bootstrap.main(Bootstrap.java:15)
+Caused by: java.lang.ClassNotFoundException: org.bukkit.plugin.java.JavaPlugin
+	at net.md_5.bungee.api.plugin.PluginClassloader.loadClass0(PluginClassloader.java:103)
+	at net.md_5.bungee.api.plugin.PluginClassloader.loadClass(PluginClassloader.java:59)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:522)
+	... 13 more
+00:50:47 [WARNING] Forced host server pvp is not defined
+00:50:47 [INFO] Enabled plugin reconnect_yaml version git:reconnect_yaml:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Enabled plugin cmd_find version git:cmd_find:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Enabled plugin cmd_server version git:cmd_server:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Enabled plugin cmd_alert version git:cmd_alert:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Enabled plugin cmd_send version git:cmd_send:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Enabled plugin cmd_list version git:cmd_list:1.18-R0.1-SNAPSHOT:862bb2a:1636 by SpigotMC
+00:50:47 [INFO] Listening on /0.0.0.0:25577

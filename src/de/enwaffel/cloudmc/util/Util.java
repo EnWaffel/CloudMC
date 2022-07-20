@@ -1,5 +1,8 @@
 package de.enwaffel.cloudmc.util;
 
+import de.enwaffel.cloudmc.CloudSystem;
+import de.enwaffel.cloudmc.group.Group;
+import de.enwaffel.cloudmc.service.Service;
 import de.enwaffel.randomutils.file.FileOrPath;
 import de.enwaffel.randomutils.file.FileUtil;
 import org.json.JSONArray;
@@ -38,14 +41,22 @@ public class Util {
 
     public static JSONObject readJsonFromUrl(String url) {
         try {
-            InputStream is = new URL(url).openStream();
-            try {
+            try (InputStream is = new URL(url).openStream()) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String jsonText = readAll(rd);
-                JSONObject json = new JSONObject(jsonText);
-                return json;
-            } finally {
-                is.close();
+                return new JSONObject(jsonText);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String readFromUrl(String url) {
+        try {
+            try (InputStream is = new URL(url).openStream()) {
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+                return readAll(rd);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,14 +66,10 @@ public class Util {
 
     public static JSONArray readJsonArrayFromUrl(String url) {
         try {
-            InputStream is = new URL(url).openStream();
-            try {
+            try (InputStream is = new URL(url).openStream()) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                 String jsonText = readAll(rd);
-                JSONArray json = new JSONArray(jsonText);
-                return json;
-            } finally {
-                is.close();
+                return new JSONArray(jsonText);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,7 +121,7 @@ public class Util {
 
     public static void writeIfNotExist(String data, String to) {
         if (!new File(to).exists()) {
-            FileUtil.writeFile(data, new FileOrPath(to));
+            FileUtil.writeFile(data, FileOrPath.path(to));
         }
     }
 
@@ -138,6 +145,24 @@ public class Util {
 
     public static int randomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
+    }
+
+    public static Group groupExists(CloudSystem sys, String name) {
+        for (Group group : sys.getGroups()) {
+            if (group.getName().equals(name)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    public static Service serviceIsActive(Group group, int num) {
+        for (Service service : group.getActiveServices()) {
+            if (service.getServiceNumber() == num) {
+                return service;
+            }
+        }
+        return null;
     }
 
 }
